@@ -156,11 +156,18 @@ router.get('/img/9.jpg', ctx => {
 3. Disk Cache
 4. Push Cache
 
-`Service Worker Cache`，这个很多人都听过，是PWA应用的重要实现机制，推荐资源：[PWA应用实战](https://lavas-project.github.io/pwa-book/)。`Memory Cache`和`Disk Cache`就是前面总结的，我们强缓存和协商缓存存放资源的位置。`Memory Cache`内存缓存，是效率最高的，当然内存资源也是昂贵的有限的，不可能都使用内存缓存，`Disk Cache`磁盘缓存，相对来说读取速度慢些。一般来说，大文件或者内存使用高的情况下，资源会被丢进磁盘。`Push Cache`推送缓存，缓存的最后一道防线。是HTTP2中的内容，需要自行去了解。
+`Service Worker Cache`，这个很多人都听过，是PWA应用的重要实现机制，推荐资源：[PWA应用实战](https://lavas-project.github.io/pwa-book/)。
+
+`Memory Cache`和`Disk Cache`就是前面总结的，我们强缓存和协商缓存存放资源的位置。`Memory Cache`内存缓存，是效率最高的，当然内存资源也是昂贵的有限的，不可能都使用内存缓存，`Disk Cache`磁盘缓存，相对来说读取速度慢些。一般来说，大文件或者内存使用高的情况下，资源会被丢进磁盘。
+
+`Push Cache`推送缓存，缓存的最后一道防线。是HTTP2中的内容，需要自行去了解。
 
 ### 总结几个点
 
 1、协商缓存中有两组约定的字段，一是`Last-Modified`和`If-Modified-Since`；二是`ETag`和`If-None-Match`。也就是响应头中存在`Last-Modified`(或`ETag`)，则下次请求的响应头中会自动增加`If-Modified-Since`(或`If-None-Match`)字段，至于是否走协商缓存取决于具体代码，比如触发条件一般就是比较同一组数据是否相同，同时因为第二组更加准确，所以优先级也更高。
+
 2、`Cache-Control: private`和`Cache-Control: max-age=0`，效果不完全相同，前者不会让`Expires`失效。
+
 3、浏览器缓存机制总览，首先如果命中强缓存就直接使用；否则就进入协商缓存阶段，这里会产生http请求，通过协商缓存的两组规范，检查资源是否更新。没更新的话就返回304状态码，否则就重新获取资源并返回200状态码。
+
 4、通过上面的演示可以看得出来，处理缓存的工作量主要在后端，然后在工作中，静态资源我们一般都是直接使用中间件来处理，比如笔者在Koa项目中的话，会用`koa-static`这个中间件。前端不需要写相关代码，后端用现成的轮子，因此缓存相关的知识就被抛弃了。
