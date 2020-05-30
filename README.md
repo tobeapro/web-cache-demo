@@ -60,7 +60,7 @@ router.get('/img/3.jpg', ctx => {
 router.get('/img/4.jpg', ctx => {
     const file = fs.readFileSync(path.resolve(__dirname,`.${ctx.request.path}`))
     ctx.set({
-        'Expires': new Date((+new Date() - 1000*60*60*24*3)),
+        'Expires': new Date((+new Date() + 1000*60*60*24*3)),
         'Cache-control': 's-maxage=10'
     })
     ctx.body = file
@@ -70,7 +70,7 @@ router.get('/img/4.jpg', ctx => {
 
 #### 2.3 private和public
 和前面两个属性相关，`private`对应资源可以被浏览器缓存，`public`表示资源既可以被浏览器缓存，也可以被代理服务器缓存。
-默认值是`private`，相当于设置了`max-age`的情况；当设置了`s-maxage`属性，就表示可以被代理服务器缓存，也就是等同于设置成`public`。
+默认值是`private`，相当于设置了`max-age`的情况；当设置了`s-maxage`属性，就表示可以被代理服务器缓存。
 
 这里请看demo5
 ```js
