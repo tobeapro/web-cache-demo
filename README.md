@@ -29,14 +29,14 @@ router.get('/img/1.jpg', ctx => {
 HTTP1.1新增了`Cache-Control`字段，Cache-Control优先级高于Expires，两者同时使用时会忽略Expires(Expires保留的作用是向下兼容)，Cache-Control字段属性值比较灵活。
 
 #### 2.1 max-age
-max-age指定资源的有效时间，单位是秒。以下是demo2，`Cache-controla:max-age=0`，同时设置Expires。测试可以看到图片始终不会缓存，也体现出了优先级的问题。
+max-age指定资源的有效时间，单位是秒。以下是demo2，`Cache-Controla:max-age=0`，同时设置Expires。测试可以看到图片始终不会缓存，也体现出了优先级的问题。
 ```js
 // demo2
 router.get('/img/2.jpg', ctx => {
     const file = fs.readFileSync(path.resolve(__dirname,`.${ctx.request.path}`))
     ctx.set({
         'Expires': new Date((+new Date() + 1000*60*60*24*3)),
-        'Cache-control': 'max-age=0'
+        'Cache-Control': 'max-age=0'
     })
     ctx.body = file
 })
@@ -47,7 +47,7 @@ router.get('/img/2.jpg', ctx => {
 router.get('/img/3.jpg', ctx => {
     const file = fs.readFileSync(path.resolve(__dirname,`.${ctx.request.path}`))
     ctx.set({
-        'Cache-control': 'max-age=10'
+        'Cache-Control': 'max-age=10'
     })
     ctx.body = file
 })
@@ -61,7 +61,7 @@ router.get('/img/4.jpg', ctx => {
     const file = fs.readFileSync(path.resolve(__dirname,`.${ctx.request.path}`))
     ctx.set({
         'Expires': new Date((+new Date() + 1000*60*60*24*3)),
-        'Cache-control': 's-maxage=10'
+        'Cache-Control': 's-maxage=10'
     })
     ctx.body = file
 })
@@ -70,7 +70,7 @@ router.get('/img/4.jpg', ctx => {
 
 #### 2.3 private和public
 和前面两个属性相关，`private`对应资源可以被浏览器缓存，`public`表示资源既可以被浏览器缓存，也可以被代理服务器缓存。
-默认值是`private`，相当于设置了`max-age`的情况；当设置了`s-maxage`属性，就表示可以被代理服务器缓存。
+默认值是`private`，相当于设置了`max-age`的情况；当设置了`s-maxage`属性，就表示只能被代理服务器缓存。
 
 这里请看demo5
 ```js
@@ -78,7 +78,7 @@ router.get('/img/4.jpg', ctx => {
 router.get('/img/5.jpg', ctx => {
     const file = fs.readFileSync(path.resolve(__dirname,`.${ctx.request.path}`))
     ctx.set({
-        'Cache-control': 'private'
+        'Cache-Control': 'private'
     })
     ctx.body = file
 })
@@ -91,7 +91,7 @@ router.get('/img/6.jpg', ctx => {
     const file = fs.readFileSync(path.resolve(__dirname,`.${ctx.request.path}`))
     ctx.set({
         'Expires': new Date((+new Date() + 1000*60*60*24*3)),
-        'Cache-control': 'private'
+        'Cache-Control': 'private'
     })
     ctx.body = file
 })
@@ -117,7 +117,7 @@ router.get('/img/8.jpg', ctx => {
         return ctx.status = 304
     }
     ctx.set({
-        'Cache-control': 'no-cache',
+        'Cache-Control': 'no-cache',
         'Last-Modified': stats.mtime.toUTCString()
     })
     ctx.body = file
@@ -125,7 +125,7 @@ router.get('/img/8.jpg', ctx => {
 ```
 第一次请求后，在响应头中加入`Last-Modified`字段，返回资源的最后修改时间，下次请求时客户端请求头会带上`If-Modified-Since`的字段，里面的值就是之前响应头中`Last-Modified`的值，然后进行比较，如果没有变化，则返回304的状态码。
 ![demo3.png](./doc/demo3.png)
-如果改造一下把`'Cache-control': 'no-cache'`去掉呢，测试后发现，在不清缓存的情况资源就变成强缓存了，请求头中的`If-Modified-Since`也没有了(加上也没用，因为不会发送http请求)，导致文件更新就无法检测了。
+如果改造一下把`'Cache-Control': 'no-cache'`去掉呢，测试后发现，在不清缓存的情况资源就变成强缓存了，请求头中的`If-Modified-Since`也没有了(加上也没用，因为不会发送http请求)，导致文件更新就无法检测了。
 ### 2、 ETag和If-None-Match
 请看demo9
 ```js
@@ -141,7 +141,7 @@ router.get('/img/9.jpg', ctx => {
         return ctx.status = 304
     }
     ctx.set({
-        'Cache-control': 'no-cache',
+        'Cache-Control': 'no-cache',
         'Last-Modified': stats.mtime.toUTCString(),
         'ETag': 'abc123'
     })
